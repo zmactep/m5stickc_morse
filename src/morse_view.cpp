@@ -67,16 +67,28 @@ void MorseView::add_symbol() {
         return;
     }
 
+    if (this->is_full()) {
+        this->display->fillRect(this->shift_x, this->shift_y + this->symbol_h, 
+                                this->display->width(), this->display->height(), 
+                                BLACK);
+        this->display->setCursor(this->shift_x, this->shift_y + this->symbol_h);
+    }
+
     this->display->setTextColor(WHITE);
     this->display->print(symbol);
+
+    if (this->is_lineend()) {
+        int16_t cursor_y = this->display->getCursorY(); 
+        this->display->setCursor(this->shift_x, cursor_y + this->symbol_h);
+    }
 }
 
-void MorseView::del_symbol() {
+bool MorseView::del_symbol() {
     int16_t cursor_x = this->display->getCursorX();
     int16_t cursor_y = this->display->getCursorY();
 
     if (cursor_x == this->shift_x && cursor_y == this->shift_y + this->symbol_h) {
-        return;
+        return false;
     }
 
     if (cursor_x == this->shift_x && cursor_y != this->shift_y + this->symbol_h) {
@@ -89,4 +101,19 @@ void MorseView::del_symbol() {
 
     this->display->fillRect(cursor_x, cursor_y, this->symbol_w, this->symbol_h, BLACK);
     this->display->setCursor(cursor_x, cursor_y);
+    
+    return true;
+}
+
+bool MorseView::is_full() const {
+    int16_t cursor_y = this->display->getCursorY();
+    int16_t max_cursor_y = this->display->height() - this->shift_y - this->symbol_h - 1;
+
+    return cursor_y >= max_cursor_y;
+}
+
+bool MorseView::is_lineend() const {
+    int16_t cursor_x = this->display->getCursorX();
+
+    return cursor_x >= this->display->width() - this->shift_x - 1;
 }

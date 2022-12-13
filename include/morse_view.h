@@ -30,5 +30,8 @@ public:
     void add_code();
 
     void add_symbol();
-    void del_symbol();
+    bool del_symbol();
+
+    bool is_full() const;
+    bool is_lineend() const;
 };
